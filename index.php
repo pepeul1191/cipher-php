@@ -2,37 +2,37 @@
 
 require 'vendor/autoload.php';
 header('x-powered-by: PHP');
+header('Server: Ubuntu');
+header("Access-Control-Allow-Origin: *");
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+header('Content-type: text/html; charset=UTF-8');
 
 class Cipher{
     public static function encode(){
-    		$key = Flight::request()->query['key'];
-    		$texto = Flight::request()->query['texto'];
-    		$securekey = hash('sha256',$key,TRUE);
-        $iv = mcrypt_create_iv(16);
-
-        echo base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $securekey, $texto, MCRYPT_MODE_ECB, $iv));
+        $key = Flight::request()->query['key'];
+        $texto = Flight::request()->query['texto'];
+         
+         echo base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, md5($key), $texto, MCRYPT_MODE_CBC, md5(md5($key))));
     }
     
     public static function decode(){
-    		$key = Flight::request()->query['key'];
-    		$texto = Flight::request()->query['texto'];
-    		$securekey = hash('sha256',$key,TRUE);
-        $iv = mcrypt_create_iv(16);
+        $key = Flight::request()->query['key'];
+        $texto = Flight::request()->query['texto'];
 
-        echo trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $securekey, base64_decode($texto), MCRYPT_MODE_ECB, $iv));
+        echo rtrim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($key), base64_decode($texto), MCRYPT_MODE_CBC, md5(md5($key))), "\0");
     }
 
     public static function key(){
-    		$length = 13;
-    		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-	    $charactersLength = strlen($characters);
-	    $randomString = '';
-	    
-	    for ($i = 0; $i < $length; $i++) {
-	        $randomString .= $characters[rand(0, $charactersLength - 1)];
-	    }
+        $length = 13;
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
 
-	    echo $randomString;
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+
+        echo $randomString;
     }
 }
 
